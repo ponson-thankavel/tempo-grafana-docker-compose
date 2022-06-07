@@ -1,0 +1,23 @@
+version: "3"
+services:
+
+  tempo:
+    image: grafana/tempo:main-e87b42a
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo-local.yaml:/etc/tempo.yaml
+      - ./tempo-data/:/tmp/tempo
+    ports:
+      - "4317:4317"  # otlp ingest
+      - "3200:3200"   # tempo
+
+  grafana:
+    image: grafana/grafana:8.5.3
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
